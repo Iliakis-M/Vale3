@@ -1,0 +1,10 @@
+{
+	"$schema": "./config.schema.json",
+	"prefix": "!",
+	"cust": "cust.config.json",
+	"client": {
+		"messageCacheLifetime": 1800,
+		"disableEveryone": true,
+		"apiRequestMethod": "sequential"
+	}
+}

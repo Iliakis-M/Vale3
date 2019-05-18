@@ -1,0 +1,32 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$comment": "Made by  V. H.  2k19",
+	"title": "Vale config schema",
+	"description": "The schema of the main config file",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"prefix": {
+			"type": "string",
+			"description": "The prefix of the bot (discord-side)",
+			"default": "!"
+		},
+		"cust": {
+			"type": "string",
+			"description": "The location on the custom secondary config (relative)",
+			"default": "cust.config.json"
+		},
+		"client": {
+			"type": "object",
+			"description": "Discord.ClientOptions",
+			"default": {
+				"messageCacheLifetime": 1800,
+				"disableEveryone": true
+			}
+		}
+	},
+	"type": "object",
+	"required": [ "prefix" ],
+	"additionalProperties": false
+}
