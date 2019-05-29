@@ -10,8 +10,10 @@ export const command = new Classes.Command({
 	usage: "eval[ code<JS>]",
 	exp: /^!e(val)?( |\n).+$/smi,
 	category: "Owner",
+	data: { },
 	body: async function body(message: Message, vale: Classes.Vale) {
-		let app: OAuth2Application;
+		let app: OAuth2Application,
+			reply = Classes.failsafe.bind(message);
 
 		if (vale.client.user.bot) {
 			app = await vale.client.fetchApplication();
@@ -41,7 +43,7 @@ export const command = new Classes.Command({
 				});
 			}
 		} else {
-			message.reply("**You are not allowed to use this command!**");
+			reply("**You are not allowed to use this command!**");
 		}
 	}, //body
 });

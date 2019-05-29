@@ -9,9 +9,11 @@ export const command = new Classes.Command({
 	usage: "help[ command<String>]",
 	category: "Utility",
 	exp: /^!he?lp( .+)?$/smi,
+	data: { },
 	body: async function body(message: Message, vale: Classes.Vale) {
 		let reg = message.content.split(' ').slice(1).join(' '),
-			app: OAuth2Application;
+			app: OAuth2Application,
+			reply = Classes.failsafe.bind(message);
 		
 		if (vale.client.user.bot) {
 			app = await vale.client.fetchApplication();
@@ -30,16 +32,10 @@ export const command = new Classes.Command({
 			};
 		}
 		
-		(message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values())).filter((cmd: Classes.Command) => {
-			if (message.author.id !== app.owner.id && cmd.category === "Owner") {
-				return false;
-			} else {
-				return true;
-			}
-		}).forEach((cmd: Classes.Command) => {
+		(message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values())).filter((cmd: Classes.Command) => !(message.author.id !== app.owner.id && cmd.category === "Owner")).forEach((cmd: Classes.Command) => {
 			let embed: RichEmbed = new RichEmbed();
 
-			embed.setColor('#' + Math.round(Math.random() * (255 ** 3)).toString(16))
+			embed.setColor("RANDOM")
 			.setAuthor("Vale3", vale.client.user.displayAvatarURL, `https://discordapp.com/users/${app.owner.id}`)
 			.setThumbnail(vale.client.user.avatarURL)
 			.setURL("https://github.com/Valen-H/Vale-3")
@@ -53,7 +49,7 @@ export const command = new Classes.Command({
 			.addField("Description", cmd.desc)
 			.addField("Category", cmd.category);
 
-			message.reply({
+			reply({
 				split: true,
 				code: "js",
 				embed

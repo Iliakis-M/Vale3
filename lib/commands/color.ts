@@ -7,23 +7,30 @@ export const command = new Classes.Command({
 	name: "color",
 	desc: "Get a specific color or a random one",
 	usage: "color[ hex<String>]",
-	exp: /^!col(or)?( .+)?$/i,
+	exp: /^!co?l(o?r)?( .+)?$/i,
 	category: "Utility",
-	body: async function body(message: Message, vale: Classes.Vale) {
-		let embed: RichEmbed = new RichEmbed();
+	data: { },
+	body: async function body(message: Message, vale?: Classes.Vale) {
+		let embed: RichEmbed = new RichEmbed(),
+			reply = Classes.failsafe.bind(message);
+		
 		embed.addBlankField();
+
 		if (message.content.includes(' ')) {
-			embed.setColor(message.content.split(' ').slice(1).join(' '));
+			embed.setColor(message.content.split(' ').slice(1).join(' ').toUpperCase());
 		} else {
-			embed.setColor('#' + Math.round(Math.random() * (255 ** 3)).toString(16));
+			embed.setColor("RANDOM");
 		}
-		message.reply({ embed });
+
+		embed.setTitle(embed.color);
+
+		reply({ embed });
 	}, //body
 });
 
 export async function init(vale: Classes.Vale) {
 	command.usage = vale.opts.config.prefix + command.usage;
-	command.exp = new RegExp('^' + vale.opts.config.prefix + "col(or)?( .+)?$", "i");
+	command.exp = new RegExp('^' + vale.opts.config.prefix + "co?l(o?r)?( .+)?$", "i");
 
 	return command;
 } //init

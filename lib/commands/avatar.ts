@@ -9,6 +9,7 @@ export const command = new Classes.Command({
 	usage: "avatar[ username<String>]",
 	exp: /^!ava(tar)?( .+)?$/smi,
 	category: "Utility",
+	data: { },
 	body: async function body(message: Message, vale: Classes.Vale) {
 		/**
 		 * PROPAGATE:
@@ -17,6 +18,9 @@ export const command = new Classes.Command({
 		 * 
 		 * Can fetch guild/group banner
 		 */
+
+		let reply = Classes.failsafe.bind(message);
+		
 		try {
 			let send: string;  //!!move to inner-scope
 
@@ -27,7 +31,7 @@ export const command = new Classes.Command({
 					from = (message.channel["recipients"] || message.channel["members"]);
 
 				if (from) {
-					let tmp;
+					let tmp: { user: { avatarURL: string; }; };
 
 					if (message.guild) {
 						tmp = from.find((mmb: GuildMember) => mmb.user.username === targ || mmb.nickname === targ || mmb.id === targ) ||  //user, nick, id
@@ -46,12 +50,12 @@ export const command = new Classes.Command({
 					send = message.channel["recipient"].avatarURL;
 				}
 
-				message.reply(send);
+				reply(send);
 			} else {
-				message.reply(message.author.avatarURL);
+				reply(message.author.avatarURL);
 			}
 		} catch (err) {
-			message.reply("User not found!");
+			reply("User not found!");
 		}
 	}, //body
 });

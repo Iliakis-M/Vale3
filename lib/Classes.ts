@@ -8,19 +8,24 @@ import * as path from "path";
 import { EventEmitter } from "events";
 import { EOL } from "os";
 import { inspect } from "util";
+import { get, RequestOptions } from "https";
+import { URL } from "url";
+import { IncomingMessage } from "http";
 export const chalk = require("chalk");
-
-export var stripAnsi;
+export var stripAnsi: {
+	(c: any): any;
+};
 
 try {
 	stripAnsi = require("strip-ansi");
 } catch (opt) {
-	stripAnsi = c => c;
+	stripAnsi = (c: any) => c;
 }
 
 
 /**
  * VAL-1: TO BE USED BOTH WITH USER AND BOTS ACCOUNTS
+ * VAL-2: RELOAD ONLY MODIFIED MODULES/COMMANDS!
  */
 
 
@@ -30,9 +35,17 @@ export module Classes {
 
 		export interface ValeOpts {
 
-			token?: string;
-			config?;
-			custconfig?;
+			readonly token: string;
+			config: {
+				cust?: string | number | Buffer;
+				prefix: string;
+				client?: Discord.ClientOptions;
+			};
+			custconfig?: {
+				panel?: any;
+				whook?: any;
+				[idx: string]: any;
+			};
 
 		} //ValeOpts
 
@@ -40,17 +53,15 @@ export module Classes {
 
 			name: string;
 			exp: RegExp;
-			desc: string;
-			usage: string;
-			/**
-			 * Utility, Owner
-			 * 
+			desc?: string;
+			usage?: string;
+			/** Utility, Owner, Admin
 			 * @type {string}
 			 * @memberof CommandOpts
 			 */
-			category: string;
+			category?: string;
 			data?: any;
-			body?: (message: Discord.Message, vale: Vale) => Promise<any>;
+			body: (message: Discord.Message, vale: Vale) => Promise<any>;
 			_remove?: (vale?: Vale) => Promise<any>;
 
 		} //CommandOpts
@@ -61,6 +72,7 @@ export module Classes {
 			cache: CacheEntry[];
 			name?: string;
 			autopurge?: boolean;
+			reusables?: boolean;
 
 		} //CacheBankOpts
 
@@ -69,27 +81,27 @@ export module Classes {
 
 	export namespace Errors {
 
-		export const EBADSZ = new RangeError("Bad Size.");
+		export const EBADSZ: RangeError = new RangeError("Bad Size.");
 
 	} //Errors
 
 
-	type CacheEntry = {
+	export type CacheEntry = {
 		timestamp: number;
 		entry: any
-	}
+	};
 
 
 	export class Vale extends EventEmitter {
 
-		opts: Options.ValeOpts;
-		client: Discord.Client;
+		readonly opts: Options.ValeOpts;
+		readonly client: Discord.Client;
 		whook: Discord.Webhook;
 		_debuglog: string;
 		_panel: adm_panel.Classes.Panel;
 		commands: Map<string, Command> = new Map();
 
-		static defaultOpts: Options.ValeOpts = {
+		public static defaultOpts: Options.ValeOpts = {
 			token: '',
 			config: {
 				prefix: '!',
@@ -102,7 +114,7 @@ export module Classes {
 			custconfig: { }
 		};
 
-		constructor(opts: Options.ValeOpts = Vale.defaultOpts) {
+		public constructor(opts: Options.ValeOpts = Vale.defaultOpts) {
 			super();
 
 			let nopts: Options.ValeOpts = <Options.ValeOpts>{ };
@@ -113,21 +125,27 @@ export module Classes {
 			this.client = new Discord.Client(opts.config.client);
 		} //ctor
 
-		start() {
+		public on(event: "log", listener: (...args: any[]) => void): this;
+		public on(event: "rawlog", listener: (...args: any[]) => void): this;
+
+		//@Override
+		public on(event: string | symbol, listener: (...args: any[]) => void): this {
+			return super.on(event, listener);
+		} //on
+
+		public start() {
 			Vale3.setup(this);
 			this.client.login(this.opts.token);  //!destroy()
 			return this;
 		} //start
 
-		async command(message: Discord.Message) {
+		public async command(message: Discord.Message) {
 			try {
 				let found = Array.from(this.commands.values()).find((cmd: Command) => cmd.exp.test(message.content));
 
 				if (found) {
 					//@ts-ignore
-					this._debug(chalk.keyword("orange").dim(message.author.tag + " (" + message.channel.name + "  -  [ " + message.guild.name + " ] )") + ":", chalk.yellow(message.content), "---", chalk.grey.dim(Date()));
-					//@ts-ignore
-					if (this.whook) this.whook.send("```" + message.author.tag + " (" + message.channel.name + "  -  [ " + message.guild.name + " ] ): " + message.content + "  ---  " + Date() + "```");
+					this._debug(chalk.keyword("orange").dim(message.author.tag + " (" + message.channel.name + "  -  [ " + (message.guild || { name: "undefined" }).name + " ] )") + ":", chalk.yellow(message.content), "---", chalk.grey.dim(Date()));
 					return await found.body(message, this);
 				}
 			} catch (err) {
@@ -139,28 +157,51 @@ export module Classes {
 			let prec: string;
 			this._debuglog += (prec = msg.join(' ')) + " --- " + Date() + EOL;
 			this.emit("log", prec);
+			this.emit("rawlog", stripAnsi(prec));
 			if (this._panel && this._panel.sock)this._panel.sock.of("/admin").to("admin").send(stripAnsi(prec));
 			return prec;
 		} //_debug
 
 		async _loadCMD(from: string = "dist/lib/commands/") {
-			let files = await fs.readdir(from);
+			let stats = await fs.stat(from);
 
-			for (let file of files) {
-				let comm,
-					full: string;
+			if (stats.isDirectory()) {
+				let files = await fs.readdir(from);
+
+				for (let file of files) {
+					let comm: any,
+						full: string;
 				
+					try {
+						delete require.cache[require.resolve(full = path.resolve(path.join(from, file)))];
+						comm = require(full);
+						await comm.init(this);
+					} catch (err) {
+						this._debug(chalk.red(inspect(err)));
+						continue;
+					}
+
+					this.commands.set(comm.command.name, comm.command);
+				}
+
+				this._debug(chalk.cyan.dim("Loaded bot commands"), chalk.grey.dim(" ---  " + Date()));
+			} else {
+				let comm: any,
+					full: string;
+
 				try {
-					delete require.cache[require.resolve(full = path.resolve(path.join(from, file)))];
+					delete require.cache[require.resolve(full = path.resolve(from))];
 					comm = require(full);
 					await comm.init(this);
 				} catch (err) {
 					this._debug(chalk.red(inspect(err)));
+					return this;
 				}
+
 				this.commands.set(comm.command.name, comm.command);
+				this._debug(chalk.cyan.dim("Loaded bot command: " + from), chalk.grey.dim(" ---  " + Date()));
 			}
 
-			this._debug(chalk.cyan.dim("Loaded bot commands"), chalk.grey.dim(" ---  " + Date()));
 			return this;
 		} //_loadCMD
 
@@ -168,56 +209,66 @@ export module Classes {
 
 	export class Command implements Options.CommandOpts {
 
-
-		name: string;
-		exp: RegExp;
-		desc: string = '';
-		usage: string = '';
-		category: string = '';
-		data: any = { };
+		public readonly name: string;
+		public exp: RegExp;
+		public desc?: string = '';
+		public usage?: string = '';
+		public category?: string = '';
+		public data?: any = { };
 		
-		constructor(opts: Options.CommandOpts) {
+		public constructor(opts: Options.CommandOpts) {
 			Object.assign(this, opts);
 		} //ctor
 
 		//@Override
-		async body(message?: Discord.Message, vale?: Vale) {
-			//must support non-message commanding
+		public async body(message?: Discord.Message, vale?: Vale) {
+			//can support non-message commanding?
 		} //body
 
 		//@Override
 		async _remove(vale?: Vale) {
-			//cleanup
+			//cleanup(?)
 		} //_remove
 
 	} //Command
 
 	export class CacheBank implements Options.CacheBankOpts {
 
-		size: number = 0;
-		cache: CacheEntry[] = [];
-		name: string = "CacheBank-" + CacheBank.cntr++;
-		autopurge: boolean = true;
+		public size: number = 50;
+		cache: CacheEntry[] = [ ];
+		public name: string = "CacheBank-" + CacheBank.cntr++;
+		public autopurge: boolean = false;
+		public reusables: boolean = false;
 
-		static cntr: number = 0;
+		private static cntr: number = 0;
 
-		constructor(name?: string, size: number = 50, autopurge: boolean = true) {
+		public constructor(name?: string, size: number = 50, autopurge: boolean = true, reusables: boolean = true) {
 			this.name = name || this.name;
-			this.size = size;
-			this.autopurge = autopurge;
+			this.size = size || this.size;
+			this.autopurge = autopurge || this.autopurge;
+			this.reusables = reusables || this.reusables;
 		} //ctor
 
-		get(item: number) {
+		public get(item: number): any {
 			if (this.cache.length === 0) throw Errors.EBADSZ;
 
 			if (item === undefined || item === null) {
-				return this.cache[Math.round(Math.random() * (this.cache.length - 1))];
+				let idx: number = Math.round(Math.random() * (this.cache.length - 1)),
+					tmp: CacheEntry = this.cache[idx];
+				
+				if (this.reusables === false) this.cache.splice(idx, 1);
+				
+				return tmp.entry;
 			} else {
-				return this.cache[item];
+				let tmp: CacheEntry = this.cache[item];
+
+				if (this.reusables === false) this.cache.splice(item, 1);
+
+				return tmp.entry;
 			}
 		} //random
 
-		purge(items = 1) {
+		purge(items: number = 1): CacheEntry[] {
 			let out: CacheEntry[] = [ ];
 
 			this._arrange();
@@ -229,7 +280,7 @@ export module Classes {
 			return out;
 		} //purge
 
-		push(item: any) {
+		public push(item: any): number {
 			if (this.autopurge && this.cache.length === this.size - 1) this.purge();
 			
 			return this.cache.push({
@@ -238,11 +289,32 @@ export module Classes {
 			});
 		} //push
 
-		_arrange() {
+		_arrange(): CacheEntry[] {
 			return this.cache = this.cache.sort((a: CacheEntry, b: CacheEntry) => a.timestamp - b.timestamp);
 		} //_arrange
 
 	} //CacheBank
+
+	export async function fetch(url: string | RequestOptions | URL): Promise<string> {
+		return new Promise((res: (value: string) => void, rej): void => {
+			get(url, (resp: IncomingMessage): void => {
+				let reply: string = '';
+
+				resp.on("data", (chunk: Buffer): void => {
+					reply += chunk;
+				});
+				resp.once("close", () => res(decodeURIComponent(reply)));
+			}).once("error", rej);
+		});
+	} //fetch
+
+	export async function failsafe(this: Discord.Message, ...params: any[]): Promise<Discord.Message | Discord.Message[]> {
+		try {
+			return await this.reply(...params);
+		} catch (err) {
+			return await this.author.send(...params);
+		}
+	} //failsafe
 
 } //Classes
 

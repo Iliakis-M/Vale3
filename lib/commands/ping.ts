@@ -9,11 +9,14 @@ export const command = new Classes.Command({
 	usage: "ping",
 	exp: /^!pings?$/i,
 	category: "Utility",
+	data: { },
 	body: async function body(message: Message, vale: Classes.Vale) {
+		let reply = Classes.failsafe.bind(message);
+
 		if (message.content.endsWith('s')) {
-			message.reply("Pong! " + vale.client.pings.join(", ") + " ms");
+			reply("Pongs! " + vale.client.pings.map((ping: number) => Math.round(ping * 100) /100).join(", ") + " ms");
 		} else {
-			message.reply("Pong! " + vale.client.ping + "ms");
+			reply("Pong! " + (Math.round(vale.client.ping * 100) / 100) + "ms");
 		}
 	}, //body
 });

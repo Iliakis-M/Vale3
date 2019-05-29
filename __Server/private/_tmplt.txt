@@ -1,0 +1,25 @@
+"use strict";
+
+import Classes from "../Classes";
+import { Message } from "discord.js";
+
+export const command = new Classes.Command({
+	name: "",
+	desc: "",
+	usage: "",
+	exp: /^!$/i,
+	category: "Utility",
+	data: {},
+	body: async function body(message: Message, vale?: Classes.Vale) {
+
+	}, //body
+});
+
+export async function init(vale: Classes.Vale) {
+	command.usage = vale.opts.config.prefix + command.usage;
+	command.exp = new RegExp('^' + vale.opts.config.prefix + "$", "i");
+
+	return command;
+} //init
+
+export default init;

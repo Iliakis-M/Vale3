@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "A discord.js bot",
   "keywords": [
-    "vale3"
+    "vale3",
+    "adm-panel2",
+    "vale-server-ii",
+    "discord",
+    "bot"
   ],
   "homepage": "https://github.com/ValentinHacker/Vale3#README.md",
   "bugs": {
@@ -40,22 +44,23 @@
   },
   "dependencies": {
     "@discordjs/uws": "^10.149.0",
-    "adm-panel2": "^1.0.1-0",
+    "adm-panel2": "^1.0.2",
     "bufferutil": "^4.0.0",
     "chalk": "^2.4.2",
     "discord.js": "^11.5.0",
-    "fs-extra": "^8.0.0",
-    "libsodium-wrappers": "^0.7.3",
+    "fs-extra": "^8.0.1",
+    "libsodium-wrappers": "^0.7.4",
     "opusscript": "0.0.6"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.1.0",
     "tslib": "^1.9.3",
-    "typescript": "^3.4.5"
+    "typescript": "^3.5.1"
   },
   "peerDependencies": {},
   "optionalDependencies": {
-    "strip-ansi": "^5.2.0"
+    "strip-ansi": "^5.2.0",
+    "wordnet": "^0.1.2"
   },
   "engines": {
     "node": ">=12.0.0",
@@ -66,8 +71,8 @@
   "publishConfig": {},
   "scripts": {
     "start": "node index.js",
-    "test": "node test/index.js || npm test",
-    "bat": "./start.bat",
+    "test": "node test/index.js --expose-gc --experimental-workers || npm test",
+    "debug": "node --inspect-brk=9229 test/index.js --expose-gc --experimental-workers",
     "build": "npx tsc -w"
   },
   "bundleDependencies": []

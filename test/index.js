@@ -14,6 +14,6 @@ fs.watch("dist/", {
 		process.exit(2);
 	} else if (!lock) {
 		lock = true;
-		global["bot"]._loadCMD().then(() => lock = false);
+		global["bot"]._loadCMD(path.join("dist", file)).then(() => lock = false);
 	}
 });
