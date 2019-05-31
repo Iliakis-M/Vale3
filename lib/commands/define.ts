@@ -15,7 +15,7 @@ export const command = new Classes.Command({
 	name: "define",
 	desc: "Define a word",
 	usage: "define word<String>",
-	exp: /^!def(ine)? .+$/i,
+	exp: /^!def(ine)? .+$/si,
 	category: "Utility",
 	data: { },
 	body: async function body(message: Message, vale?: Classes.Vale) {
@@ -52,9 +52,9 @@ export const command = new Classes.Command({
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
-	command.exp = new RegExp('^' + vale.opts.config.prefix + "def(ine)? .+$", "i");
+	command.exp = new RegExp('^' + vale.opts.config.prefix + "def(ine)? .+$", "si");
 
 	return command;
 } //init
@@ -62,7 +62,7 @@ export async function init(vale: Classes.Vale) {
 export default init;
 
 
-/* SAMPLE OUTPUT
+/* SAMPLE OUTPUT - test
 [
 	{
 		meta: {

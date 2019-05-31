@@ -1,7 +1,9 @@
 "use strict";
 
-import Classes from "../Classes";
+import Classes, { chillout } from "../Classes";
 import { Message, RichEmbed, OAuth2Application } from "discord.js";
+
+//Perhaps combine all occurence-searches in one and split general help screen to code block?
 
 export const command = new Classes.Command({
 	name: "help",
@@ -32,7 +34,7 @@ export const command = new Classes.Command({
 			};
 		}
 		
-		(message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values())).filter((cmd: Classes.Command) => !(message.author.id !== app.owner.id && cmd.category === "Owner")).forEach((cmd: Classes.Command) => {
+		chillout.forEach((message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values())).filter((cmd: Classes.Command) => !(message.author.id !== app.owner.id && cmd.category === "Owner")), (cmd: Classes.Command): void => {
 			let embed: RichEmbed = new RichEmbed();
 
 			embed.setColor("RANDOM")
@@ -58,7 +60,7 @@ export const command = new Classes.Command({
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
 	command.exp = new RegExp('^' + vale.opts.config.prefix + "he?lp( .+)?$", "smi");
 

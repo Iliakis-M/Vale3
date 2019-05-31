@@ -11,6 +11,8 @@ import { inspect } from "util";
 import { get, RequestOptions } from "https";
 import { URL } from "url";
 import { IncomingMessage } from "http";
+import * as chillout from "chillout";
+
 export const chalk = require("chalk");
 export var stripAnsi: {
 	(c: any): any;
@@ -24,8 +26,10 @@ try {
 
 
 /**
- * VAL-1: TO BE USED BOTH WITH USER AND BOTS ACCOUNTS
- * VAL-2: RELOAD ONLY MODIFIED MODULES/COMMANDS!
+ * VAL-1: TO BE USED BOTH WITH USER AND BOTS ACCOUNTS  - can make botnet
+ * VAL-2: RELOAD ONLY MODIFIED MODULES/COMMANDS!  - external handling, _loadCMD supports singlefile
+ * VAL-3: CLEAR UNDERLYING LOGSTRINGS PERIODICALLY
+ * VAL-4: CACHEBANK AND NAMEDCACHEBANK IMPLEMENTATION
  */
 
 
@@ -125,13 +129,21 @@ export module Classes {
 			this.client = new Discord.Client(opts.config.client);
 		} //ctor
 
+		//@Override
 		public on(event: "log", listener: (...args: any[]) => void): this;
 		public on(event: "rawlog", listener: (...args: any[]) => void): this;
-
 		//@Override
 		public on(event: string | symbol, listener: (...args: any[]) => void): this {
 			return super.on(event, listener);
 		} //on
+
+		//@Override
+		public once(event: "log", listener: (...args: any[]) => void): this;
+		public once(event: "rawlog", listener: (...args: any[]) => void): this;
+		//@Override
+		public once(event: string | symbol, listener: (...args: any[]) => void): this {
+			return super.once(event, listener);
+		} //once
 
 		public start() {
 			Vale3.setup(this);
@@ -139,9 +151,9 @@ export module Classes {
 			return this;
 		} //start
 
-		public async command(message: Discord.Message) {
+		public async command(message: Discord.Message): Promise<any> {
 			try {
-				let found = Array.from(this.commands.values()).find((cmd: Command) => cmd.exp.test(message.content));
+				let found: Command = Array.from(this.commands.values()).find((cmd: Command) => cmd.exp.test(message.content));
 
 				if (found) {
 					//@ts-ignore
@@ -153,22 +165,22 @@ export module Classes {
 			}
 		} //command
 
-		_debug(...msg: any) {
+		_debug(...msg: any): string {
 			let prec: string;
 			this._debuglog += (prec = msg.join(' ')) + " --- " + Date() + EOL;
 			this.emit("log", prec);
 			this.emit("rawlog", stripAnsi(prec));
-			if (this._panel && this._panel.sock)this._panel.sock.of("/admin").to("admin").send(stripAnsi(prec));
+			if (this._panel && this._panel.sock) this._panel.sock.of("/admin").to("admin").send(stripAnsi(prec));
 			return prec;
 		} //_debug
 
-		async _loadCMD(from: string = "dist/lib/commands/") {
-			let stats = await fs.stat(from);
+		async _loadCMD(from: string = "dist/lib/commands/"): Promise<this> {
+			let stats: fs.Stats = await fs.stat(from);
 
 			if (stats.isDirectory()) {
-				let files = await fs.readdir(from);
+				let files: string[] = await fs.readdir(from);
 
-				for (let file of files) {
+				await chillout.forOf(files, async (file: string): Promise<void> => {
 					let comm: any,
 						full: string;
 				
@@ -178,11 +190,11 @@ export module Classes {
 						await comm.init(this);
 					} catch (err) {
 						this._debug(chalk.red(inspect(err)));
-						continue;
+						return;
 					}
 
 					this.commands.set(comm.command.name, comm.command);
-				}
+				});
 
 				this._debug(chalk.cyan.dim("Loaded bot commands"), chalk.grey.dim(" ---  " + Date()));
 			} else {
@@ -221,12 +233,12 @@ export module Classes {
 		} //ctor
 
 		//@Override
-		public async body(message?: Discord.Message, vale?: Vale) {
+		public async body(message?: Discord.Message, vale?: Vale): Promise<any> {
 			//can support non-message commanding?
 		} //body
 
 		//@Override
-		async _remove(vale?: Vale) {
+		async _remove(vale?: Vale): Promise<any> {
 			//cleanup(?)
 		} //_remove
 
@@ -268,14 +280,16 @@ export module Classes {
 			}
 		} //random
 
-		purge(items: number = 1): CacheEntry[] {
+		async purge(items: number = 1): Promise<CacheEntry[]> {
 			let out: CacheEntry[] = [ ];
 
 			this._arrange();
 
-			while (items--) {
+			await chillout.until((): void => {
 				out.push(this.cache.shift());
-			}
+
+				if (!items--) return chillout.StopIteration;
+			});
 
 			return out;
 		} //purge
@@ -319,3 +333,4 @@ export module Classes {
 } //Classes
 
 export default Classes;
+export { chillout };

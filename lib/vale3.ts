@@ -11,7 +11,7 @@ import Classes from "./Classes";
 import * as fs from "fs-extra";
 import { inspect } from "util";
 import { Message, RateLimitInfo, Webhook } from "discord.js";
-export const chalk = require("chalk");
+export const chalk = require("./Classes").chalk;
 
 
 export module Vale3 {

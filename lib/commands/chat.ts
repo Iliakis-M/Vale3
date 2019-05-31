@@ -7,7 +7,7 @@ export const command = new Classes.Command({
 	name: "chat",
 	desc: "Chat with me! :3",
 	usage: "chat",
-	exp: /^!chat( .*)?$/i,
+	exp: /^!chat( .*)?$/msi,
 	category: "Utility",
 	data: { },
 	body: async function body(message: Message, vale?: Classes.Vale) {
@@ -24,9 +24,9 @@ export const command = new Classes.Command({
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
-	command.exp = new RegExp('^' + vale.opts.config.prefix + "chat( .*)?$", "i");
+	command.exp = new RegExp('^' + vale.opts.config.prefix + "chat( .*)?$", "msi");
 
 	return command;
 } //init
