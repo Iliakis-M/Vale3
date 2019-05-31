@@ -16,7 +16,7 @@ export const command = new Classes.Command({
 		try {
 			let reply: string = await Classes.fetch("https://nekos.life/api/v2/chat?text=" + message.content.split(' ').slice(1).join(' '));
 
-			repl(JSON.parse(reply).response);
+			repl(JSON.parse(reply).response.replace(/<\n+>/g, ''));
 		} catch (err) {
 			repl("External API error, please try again later... https://nekos.life/api/v2/endpoints");
 			console.error(err);

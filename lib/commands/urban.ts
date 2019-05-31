@@ -15,7 +15,7 @@ export const command = new Classes.Command({
 
 		try {
 			let word: string,
-				definitions = JSON.parse(await Classes.fetch("https://api.urbandictionary.com/v0/define?term=" + (word = message.content.split(' ').slice(1).join(' ')))),
+				definitions = JSON.parse(await Classes.fetch("https://api.urbandictionary.com/v0/define?term=" + (word = encodeURIComponent(message.content.split(' ').slice(1).join(' '))))),
 				embed = new RichEmbed();
 
 			embed.setTitle(word)
@@ -53,41 +53,41 @@ export default init;
 /*for: test
 {
   list: [
-    {
-      definition: '1. the main cause of [explosions].\r' +
-        '\n2. any thing [dreaded] that your "teachers" say is "good" ' +
-        'for you. soon after, you explode for no reason.\r' +
-        '\n3. what scientists do to make stuff explode.\r' +
-        '\n4. when a sheet of paper explodes into [flames].',
-      permalink: 'http://test.urbanup.com/1876232',
-      thumbs_up: 142,
-      sound_urls: [],
-      author: 'monn-unit',
+	{
+	  definition: '1. the main cause of [explosions].\r' +
+		'\n2. any thing [dreaded] that your "teachers" say is "good" ' +
+		'for you. soon after, you explode for no reason.\r' +
+		'\n3. what scientists do to make stuff explode.\r' +
+		'\n4. when a sheet of paper explodes into [flames].',
+	  permalink: 'http://test.urbanup.com/1876232',
+	  thumbs_up: 142,
+	  sound_urls: [],
+	  author: 'monn-unit',
 >
-      defid: 1876232,
-      current_vote: '',
-      written_on: '2006-07-22T00:00:00.000Z',
-      example: '1. test [sodium] and water.\r' +
-        '\n2. SAT is a test.\r' +
-        '\n3. [Monkeys].\r' +
-        '\n4. you brought your [lighter] to test.',
-      thumbs_down: 40
-    },
-    {
-      definition: 'Everything that is [put in] [front] of you during any given [day]. ',
-      permalink: 'http://test.urbanup.com/2081307',
-      thumbs_up: 53,
-      sound_urls: [],
-      author: 'VICKI KARMA',
-      word: 'TEST',
-      defid: 2081307,
-      current_vote: '',
-      written_on: '2006-11-10T00:00:00.000Z',
-      example: 'How was your day?\r' +
-        '\n[Testing]!...but i did well at not [passing] every ' +
-        'test!...Hope i get a [better run] tomorrow. ',
-      thumbs_down: 17
-    },
+	  defid: 1876232,
+	  current_vote: '',
+	  written_on: '2006-07-22T00:00:00.000Z',
+	  example: '1. test [sodium] and water.\r' +
+		'\n2. SAT is a test.\r' +
+		'\n3. [Monkeys].\r' +
+		'\n4. you brought your [lighter] to test.',
+	  thumbs_down: 40
+	},
+	{
+	  definition: 'Everything that is [put in] [front] of you during any given [day]. ',
+	  permalink: 'http://test.urbanup.com/2081307',
+	  thumbs_up: 53,
+	  sound_urls: [],
+	  author: 'VICKI KARMA',
+	  word: 'TEST',
+	  defid: 2081307,
+	  current_vote: '',
+	  written_on: '2006-11-10T00:00:00.000Z',
+	  example: 'How was your day?\r' +
+		'\n[Testing]!...but i did well at not [passing] every ' +
+		'test!...Hope i get a [better run] tomorrow. ',
+	  thumbs_down: 17
+	},
   ]
 }
 */

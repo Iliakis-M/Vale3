@@ -1,19 +1,21 @@
   
 # Changelog  
   
-## 2019-05-31T16:12:23.098Z  
+## 2019-05-31  
   
-- `!urban word\<String>`  
+- 2/3 Rewrite of `avatar.ts`  
+- Added URLEncoding to `!urban`, their API does not seem to parse properly.  
+- `!urban word<String>`  
   
-## 2019-05-30T11:05:19.069Z  
+## 2019-05-30  
   
 - Updated underlying panel.  
   
-## 2019-05-29T21:14:21.700Z  
+## 2019-05-29  
   
 - Caching implemented, speeding up external API requests.  
 - Command reloading leaks patched.  
-- `!chat msg\<String>`  
+- `!chat msg<String>`  
 - Replaced random color generation with discord.js builtin `"RANDOM"`.  
 - `!define word<String>`  
 - Classes.failsafe for alternative messaging.  

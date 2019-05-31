@@ -17,7 +17,7 @@ This version adds portability and allows the creation of more complex botnets wh
 * `help resolvable<String>` - Get help info about command(s).  
 * `pings` - Fetch Discord heartbeat(s).  
 * `yomomma` - Fetch a cringy joke -_- .  
-* `urban word\<String>` - Fetch a ~~valid~~ definition of a word.  
+* `urban word<String>` - Fetch a ~~valid~~ definition of a word.  
   
 ### Admin  
   
