@@ -1,6 +1,6 @@
 "use strict";
 
-import Classes from "../Classes";
+import Classes, { chillout } from "../Classes";
 import { Message, RichEmbed } from "discord.js";
 
 var wordnet: {
@@ -39,9 +39,9 @@ export const command = new Classes.Command({
 						.setTimestamp()
 						.addBlankField(true);
 
-					for (let def of definitions) {
+					await chillout.forOf(definitions, (def: { meta: { words: { map: (arg0: (word: { word: string; }) => string) => void; }; synsetType: any; }; glossary: any; }): void => {
 						embed.addField(`${def.meta.words.map((word: { word: string; }) => word.word)} [${def.meta.synsetType}]:`, def.glossary, true);
-					}
+					});
 
 					reply({ embed });
 				}

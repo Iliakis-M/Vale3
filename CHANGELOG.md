@@ -1,6 +1,10 @@
   
 # Changelog  
   
+## 2019-06-01  
+  
+- 3/3 Rewrite of `avatar.ts`  
+  
 ## 2019-05-31  
   
 - 2/3 Rewrite of `avatar.ts`  

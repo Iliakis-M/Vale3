@@ -1,7 +1,7 @@
 "use strict";
 
 import Classes, { chillout } from "../Classes";
-import { Message, GuildMember, User, GuildChannel, TextChannel, GroupDMChannel, DMChannel, Emoji } from "discord.js";
+import { Message, GuildMember, User, GuildChannel, TextChannel, GroupDMChannel, DMChannel, Emoji, Collection, Snowflake } from "discord.js";
 
 export const command = new Classes.Command({
 	name: "avatar",
@@ -10,24 +10,19 @@ export const command = new Classes.Command({
 	exp: /^!ava(tar)?( .+)?$/smi,
 	category: "Utility",
 	data: { },
-	body: async function body(message: Message, vale: Classes.Vale) {
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		/**
 		 * PROPAGATE:
-		 * Channel > Guild > Group(?)
-		 * Nickname > Username
 		 * 
-		 * Can fetch guild/group banner
+		 * Channel > Guild > Group
+		 * Nickname > Username > ID
+		 * Emoji > Banner(?)
 		 */
-
 		
 		async function parse(message: Message): Promise<string[]> {
-			//Does not allow batched mentions
-			//mentions > emojis > username > nickname(?) > id [users, emojis], guild/group icon?
-			//fetch emojis by name(?)
-
 			let txt: string = message.content.split(' ').slice(1).join(' ');
 
-			function mentions() {
+			function mentions(): string[] {
 				if (message.mentions) {
 					return message.mentions.users.map((usr: User): string => usr.avatarURL);
 				}
@@ -39,7 +34,7 @@ export const command = new Classes.Command({
 				let reg: RegExp = /<:.+?:(\d+?)>/gui,
 					matches: RegExpMatchArray = txt.match(reg);
 
-				if (matches.length) {
+				if (matches && matches.length) {
 					let rets = [ ];
 
 					matches = matches.map((match) => match.replace(reg, "$1"));
@@ -59,19 +54,38 @@ export const command = new Classes.Command({
 			if (rets.length) return rets;
 
 			if (message.channel instanceof TextChannel) {
-				let tmp: GuildMember = message.channel.members.find((mmb: GuildMember): boolean => mmb.user.username.toLowerCase() === txt.toLowerCase() || mmb.id == txt || mmb.nickname.toLowerCase().includes(txt.toLowerCase()));
+				let mmbs: GuildMember[] = message.channel.members.array().sort((mmb1: GuildMember, mmb2: GuildMember): number => (mmb1.nickname || '').length - (mmb2.nickname || '').length),
+					tmp: GuildMember = mmbs.find((mmb: GuildMember): boolean => (mmb.nickname || mmb.user.username).toLowerCase().includes(txt.toLowerCase()));
+				
+				if (tmp) {
+					rets.push(tmp.user.avatarURL);
+				} else {
+					mmbs = mmbs.sort((mmb1: GuildMember, mmb2: GuildMember): number => mmb1.user.username.length - mmb2.user.username.length);
+					tmp = mmbs.find((mmb: GuildMember): boolean => mmb.user.username.toLowerCase().includes(txt.toLowerCase()));
+					
+					if (tmp) {
+						rets.push(tmp.user.avatarURL);
+					} else {
+						tmp = mmbs.find((mmb: GuildMember): boolean => mmb.id.toLowerCase().includes(txt.toLowerCase()));
 
-				if (tmp) rets.push(tmp.user.avatarURL);
+						if (tmp) rets.push(tmp.user.avatarURL);
+					}
+				}
 			} else if (message.channel instanceof GroupDMChannel) {
-				let tmp: User = message.channel.recipients.find((usr: User): boolean => usr.id == txt || usr.username.toLowerCase().includes(txt.toLowerCase()));
+				let tmp: User = message.channel.recipients.array().sort((usr1: User, usr2: User): number => (usr1.username || '').length - (usr2.username || '').length).find((usr: User): boolean => usr.id.includes(txt) || usr.username.toLowerCase().includes(txt.toLowerCase()));
 
 				if (tmp) rets.push(tmp.avatarURL);
 			} else if (message.channel instanceof DMChannel) {
-				let tmp = [message.channel.recipient, message.author].find((usr: User): boolean => usr.username.toLowerCase().includes(txt.toLowerCase()) || usr.id == txt);
+				let tmp = [message.channel.recipient, message.author].find((usr: User): boolean => usr.username.toLowerCase().includes(txt.toLowerCase()) || usr.id.includes(txt));
 
 				if (tmp) rets.push(tmp.avatarURL);
 			}
 
+			let tmp: Emoji;
+
+			if (rets.length === 0 && (tmp = vale.client.emojis.find((emj: Emoji): boolean => emj.name.toLowerCase().includes(txt.toLowerCase()))) !== null) {
+				rets.push(tmp.url);
+			}
 			if (rets.length === 0) throw "ENOTFOUND";
 
 			return rets;
@@ -83,38 +97,18 @@ export const command = new Classes.Command({
 		try {
 			
 			if (message.content.includes(' ')) {
-				let send: string,
-					targ: string = message.content.split(' ').pop(),
-					from = (message.channel["recipients"] || message.channel["members"]);
-				
-				send = (await parse(message)).join('\n');
-
-				/*if (from) {  //pluriel system
-					let tmp: { user: { avatarURL: string; }; };
-
-					if (message.guild) {
-						tmp = from.find((mmb: GuildMember): boolean => mmb.user.username === targ || mmb.nickname === targ || mmb.id === targ) ||  //user, nick, id
-							from.find((mmb: GuildMember): boolean => mmb.nickname.includes(targ) || mmb.user.username.includes(targ)) ||  //substr
-							from.find((mmb: GuildMember): boolean => mmb.nickname.toLowerCase().includes(targ.toLowerCase()) || mmb.user.username.toLowerCase().includes(targ.toLowerCase()));  //lower
-						
-						send = tmp.user.avatarURL;
-					} else {
-						tmp = from.find((mmb: User): boolean => mmb.username === targ || mmb.id === targ) ||  //user, id
-							from.find((mmb: User): boolean => mmb.username.includes(targ)) ||  //substr
-							from.find((mmb: User): boolean => mmb.username.toLowerCase().includes(targ.toLowerCase()));  //lower
-
-						send = tmp.user.avatarURL;
-					}
-				} else {  //emoji case?
-					send = message.channel["recipient"].avatarURL;
-				}*/
-
-				reply(send);
+				reply((await parse(message)).join('\n'));
 			} else {
 				reply(message.author.avatarURL);
 			}
 		} catch (err) {
-			reply("User not found!");
+			if (message.guild) {
+				reply("User not found!\n" + (message.guild.iconURL || message.guild.icon || ''));
+			} else if (message.channel instanceof GroupDMChannel) {
+				reply("User not found!\n" + (message.channel.icon || ''));
+			} else {
+				reply("User not found!\n");
+			}
 		}
 	}, //body
 });
