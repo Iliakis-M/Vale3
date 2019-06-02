@@ -5,14 +5,14 @@ import { Message, RichEmbed, OAuth2Application } from "discord.js";
 
 //Perhaps combine all occurence-searches in one and split general help screen to code block?
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "help",
 	desc: "Get usage help for a command",
 	usage: "help[ command<String>]",
 	category: "Utility",
 	exp: /^!he?lp( .+)?$/smi,
 	data: { },
-	body: async function body(message: Message, vale: Classes.Vale) {
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		let reg = message.content.split(' ').slice(1).join(' '),
 			app: OAuth2Application,
 			reply = Classes.failsafe.bind(message);

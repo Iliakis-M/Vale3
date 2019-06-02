@@ -11,14 +11,14 @@ try {
 	wordnet = require("wordnet");
 } catch (err) { }
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "define",
 	desc: "Define a word",
 	usage: "define word<String>",
 	exp: /^!def(ine)? .+$/si,
 	category: "Utility",
 	data: { },
-	body: async function body(message: Message, vale?: Classes.Vale) {
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		let reply = Classes.failsafe.bind(message);
 
 		if (wordnet) {

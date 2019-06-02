@@ -1,6 +1,11 @@
   
 # Changelog  
   
+## 2019-06-02  
+  
+- `!emojify sentence<String>`  
+- Fixed mentions in `!chat`  
+  
 ## 2019-06-01  
   
 - 3/3 Rewrite of `avatar.ts`  

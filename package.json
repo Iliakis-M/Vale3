@@ -9,9 +9,9 @@
     "discord",
     "bot"
   ],
-  "homepage": "https://github.com/ValentinHacker/Vale3#README.md",
+  "homepage": "https://github.com/Valen-H/Vale3#README.md",
   "bugs": {
-    "url": "https://github.com/ValentinHacker/Vale3/issues",
+    "url": "https://github.com/Valen-H/Vale3/issues",
     "email": "alternativexxxy@gmail.com"
   },
   "license": "ISC",
@@ -36,7 +36,7 @@
   "typings": "lib/typings",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ValentinHacker/Vale3.git",
+    "url": "git://github.com/Valen-H/Vale3.git",
     "directory": "./"
   },
   "config": {

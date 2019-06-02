@@ -3,7 +3,7 @@
 import Classes, { chillout } from "../Classes";
 import { Message, GuildMember, User, GuildChannel, TextChannel, GroupDMChannel, DMChannel, Emoji, Collection, Snowflake } from "discord.js";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "avatar",
 	desc: "Fetch a user's avatar",
 	usage: "avatar[ username<String>]",

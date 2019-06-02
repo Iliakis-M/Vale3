@@ -18,6 +18,7 @@ This version adds portability and allows the creation of more complex botnets wh
 * `pings` - Fetch Discord heartbeat(s).  
 * `yomomma` - Fetch a cringy joke -_- .  
 * `urban word<String>` - Fetch a ~~valid~~ definition of a word.  
+* `emojify sentence<String>` - Emojify your words with regional indicators!  
   
 ### Admin  
   

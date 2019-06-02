@@ -3,14 +3,14 @@
 import Classes from "../Classes";
 import { Message } from "discord.js";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "ping",
 	desc: "Ping the system to retrieve the heartbeat",
 	usage: "ping",
 	exp: /^!pings?$/i,
 	category: "Utility",
 	data: { },
-	body: async function body(message: Message, vale: Classes.Vale) {
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		let reply = Classes.failsafe.bind(message);
 
 		if (message.content.endsWith('s')) {

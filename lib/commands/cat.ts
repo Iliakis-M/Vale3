@@ -3,7 +3,7 @@
 import Classes from "../Classes";
 import { Message } from "discord.js";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "cat",
 	desc: "Fetch a cat emote :3",
 	usage: "cat",
@@ -12,7 +12,7 @@ export const command = new Classes.Command({
 	data: { 
 		cache: new Classes.CacheBank("cat", null, true, false)
 	},
-	body: async function body(message: Message, vale: Classes.Vale) {
+	body: async function body(message: Message, vale?: Classes.Vale): Promise<void> {
 		let repl = Classes.failsafe.bind(message);
 
 		try {

@@ -3,14 +3,14 @@
 import Classes, { chillout } from "../Classes";
 import { Message, RichEmbed } from "discord.js";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "urban",
 	desc: "Fetch a slang definition",
 	usage: "!urban word<String>",
 	exp: /^!urb(an)? .+$/msi,
 	category: "Utility",
 	data: { },
-	body: async function body(message: Message, vale?: Classes.Vale) {
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		let reply = Classes.failsafe.bind(message);
 
 		try {
@@ -41,7 +41,7 @@ export const command = new Classes.Command({
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
 	command.exp = new RegExp('^' + vale.opts.config.prefix + "urb(an)? .+$", "msi");
 

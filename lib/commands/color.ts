@@ -3,14 +3,14 @@
 import Classes from "../Classes";
 import { Message, RichEmbed } from "discord.js";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "color",
 	desc: "Get a specific color or a random one",
 	usage: "color[ hex<String>]",
 	exp: /^!co?l(o?r)?( .+)?$/i,
 	category: "Utility",
 	data: { },
-	body: async function body(message: Message, vale?: Classes.Vale) {
+	body: async function body(message: Message, vale?: Classes.Vale): Promise<void> {
 		let embed: RichEmbed = new RichEmbed(),
 			reply = Classes.failsafe.bind(message);
 		
