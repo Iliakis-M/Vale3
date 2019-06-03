@@ -4,15 +4,15 @@ import Classes from "../Classes";
 import { Message } from "discord.js";
 
 export const command: Classes.Command = new Classes.Command({
-	name: "cat",
-	desc: "Fetch a cat emote :3",
-	usage: "cat",
-	exp: /^!(cat|neko)$/i,
+	name: "fact",
+	desc: "Learn an interesting fact",
+	usage: "fact",
+	exp: /^!fact$/i,
 	category: "Utility",
-	data: { 
-		cache: new Classes.CacheBank("cat", undefined, true, false, "https://nekos.life/api/v2/cat")
+	data: {
+		cache: new Classes.CacheBank("fact", undefined, true, false, "https://nekos.life/api/v2/fact")
 	},
-	body: async function body(message: Message, vale?: Classes.Vale): Promise<void> {
+	body: async function body(message: Message, vale?: Classes.Vale) {
 		let repl = Classes.failsafe.bind(message);
 
 		try {
@@ -20,7 +20,7 @@ export const command: Classes.Command = new Classes.Command({
 
 			Classes.fetch(command.data.cache.source).then((reply: string) => command.data.cache.push(reply));
 
-			repl(decodeURIComponent(JSON.parse(reply).cat));
+			repl(decodeURIComponent(JSON.parse(reply).fact));
 		} catch (err) {
 			repl("External API error, please try again later... https://nekos.life/api/v2/endpoints");
 			console.error(err);
@@ -30,8 +30,8 @@ export const command: Classes.Command = new Classes.Command({
 
 export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
-	command.exp = new RegExp('^' + vale.opts.config.prefix + "(cat|neko)$", "i");
-	Classes.fetch("https://nekos.life/api/v2/cat").then((reply: string) => command.data.cache.push(reply));
+	command.exp = new RegExp('^' + vale.opts.config.prefix + "fact$", "i");
+	Classes.fetch(command.data.cache.source).then((reply: string) => command.data.cache.push(reply));
 
 	return command;
 } //init

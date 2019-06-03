@@ -29,7 +29,7 @@ try {
  * VAL-1: TO BE USED BOTH WITH USER AND BOTS ACCOUNTS  - can make botnet
  * VAL-2: RELOAD ONLY MODIFIED MODULES/COMMANDS!  - external handling, _loadCMD supports singlefile
  * VAL-3: CLEAR UNDERLYING LOGSTRINGS PERIODICALLY
- * VAL-4: CACHEBANK AND NAMEDCACHEBANK IMPLEMENTATION
+ * VAL-4: CACHEBANK AND NAMEDCACHEBANK IMPLEMENTATION  - 
  */
 
 
@@ -73,10 +73,10 @@ export module Classes {
 		export interface CacheBankOpts {
 
 			size: number;
-			cache: CacheEntry[];
 			name?: string;
 			autopurge?: boolean;
 			reusables?: boolean;
+			source?: any;
 
 		} //CacheBankOpts
 
@@ -127,6 +127,10 @@ export module Classes {
 			this.opts = nopts;
 
 			this.client = new Discord.Client(opts.config.client);
+			Object.defineProperty(this.client, "vale", {
+				writable: false,
+				value: this
+			});
 		} //ctor
 
 		//@Override
@@ -246,19 +250,12 @@ export module Classes {
 
 	export class CacheBank implements Options.CacheBankOpts {
 
-		public size: number = 50;
-		cache: CacheEntry[] = [ ];
-		public name: string = "CacheBank-" + CacheBank.cntr++;
-		public autopurge: boolean = false;
-		public reusables: boolean = false;
+		private cache: CacheEntry[] = [ ];
 
 		private static cntr: number = 0;
 
-		public constructor(name?: string, size: number = 50, autopurge: boolean = true, reusables: boolean = true) {
-			this.name = name || this.name;
-			this.size = size || this.size;
-			this.autopurge = autopurge || this.autopurge;
-			this.reusables = reusables || this.reusables;
+		public constructor(public name: string = "CacheBank-" + CacheBank.cntr++, public size: number = 50, public autopurge: boolean = true, public reusables: boolean = true, public source?: any) {
+
 		} //ctor
 
 		public get(item: number): any {
@@ -278,7 +275,7 @@ export module Classes {
 
 				return tmp.entry;
 			}
-		} //random
+		} //get
 
 		async purge(items: number = 1): Promise<CacheEntry[]> {
 			let out: CacheEntry[] = [ ];
@@ -307,7 +304,45 @@ export module Classes {
 			return this.cache = this.cache.sort((a: CacheEntry, b: CacheEntry) => a.timestamp - b.timestamp);
 		} //_arrange
 
+		//@Override
+		retrieve(...params: any): any {
+			//fetch from source
+			return false;
+		} //retrieve
+
 	} //CacheBank
+
+	export class NamedCacheBank implements Options.CacheBankOpts {
+
+		private cache: Map<string, CacheBank> = new Map<string, CacheBank>();
+
+		private static cntr: number = 0;
+
+		constructor(public name: string = "NamedCacheBank-" + NamedCacheBank.cntr++, public size: number = 50, public source?: any) {
+			
+		} //ctor
+
+		new_cache(...params: any): CacheBank {
+			let bank: CacheBank = new CacheBank(...params);
+
+			this.cache.set(bank.name, bank);
+			return bank;
+		} //new_cache
+
+		public get(item: string): any {
+			return this.cache.get(item);
+		} //get
+
+		public push(where: string, item: any): number {
+			return this.cache.get(where).push(item);
+		} //push
+
+		retrieve(...params: any): any {
+			//fetch from source
+			return false;
+		} //retrieve
+
+	} //NamedCacheBank
 
 	export async function fetch(url: string | RequestOptions | URL): Promise<string> {
 		return new Promise((res: (value: string) => void, rej): void => {
@@ -324,10 +359,18 @@ export module Classes {
 
 	export async function failsafe(this: Discord.Message, ...params: any[]): Promise<Discord.Message | Discord.Message[]> {
 		try {
-			return await this.reply(...params);
-		} catch (err) {
-			return await this.author.send(...params);
-		}
+			let msg: Discord.Message | Discord.Message[] | PromiseLike<Discord.Message | Discord.Message[]>;
+			
+			try {
+				msg = await this.reply(...params);
+			} catch (err) {
+				msg = await this.author.send(...params);
+			}
+
+			if (msg instanceof Discord.Message) msg.client["vale"]._debug(chalk.keyword("orange")(msg.client.user.username + " (" + msg.channel["name"] + "  -  [ " + (msg.guild || { name: "undefined" }).name + " ] )") + ":", chalk.yellow(msg.content), "---", chalk.grey.dim(Date()));
+			
+			return msg;
+		} catch (err) { }
 	} //failsafe
 
 } //Classes

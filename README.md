@@ -19,15 +19,17 @@ This version adds portability and allows the creation of more complex botnets wh
 * `yomomma` - Fetch a cringy joke -_- .  
 * `urban word<String>` - Fetch a ~~valid~~ definition of a word.  
 * `emojify sentence<String>` - Emojify your words with regional indicators!  
+* `fact` - Learn an interesting fact.  
+* `image class<String>` - Fetch a ~~N~~SFW image 0_0" .  
   
 ### Admin  
   
-* `help resolvable<String>` - Get help info about command(s), including admin-only ones.  
+* `help resolvable<String>` - Get help info about command(s), including *admin-only* ones.  
   
 ### Owner  
   
 * `eval code<String>` - Evaluate a JavaScript expression.  
-* `help resolvable<String>` - Get help info about command(s), including owner-only ones.  
+* `help resolvable<String>` - Get help info about command(s), including *owner-only* ones.  
   
 ## Other features  
   
@@ -36,7 +38,7 @@ This version adds portability and allows the creation of more complex botnets wh
   
 ## External APIs  
   
-* [https://nekos.life/api/v2/endpoints][nekos.life]  
+* [nekos.life]  
 * WordNet  
 * [UrbanDict](https://www.urbandictionary.com/)  
 * [Yomomma](https://yomomma.info/)  

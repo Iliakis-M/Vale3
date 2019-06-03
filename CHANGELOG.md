@@ -1,6 +1,14 @@
   
 # Changelog  
   
+## 2019-06-03  
+  
+- `!image class<String>`  
+- 'No results' mentioning on `!help`  
+- `!fact`  
+- Added bot reply logging.  
+- Fixed mentions in `!chat` (2)  
+  
 ## 2019-06-02  
   
 - `!emojify sentence<String>`  

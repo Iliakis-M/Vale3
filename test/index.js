@@ -4,7 +4,7 @@ const mod = require("../index.js"),
 	fs = require("fs-extra"),
 	path = require("path");
 
-var lock = false;
+var lock = { };
 
 fs.watch("dist/", {
 	recursive: true
@@ -12,8 +12,8 @@ fs.watch("dist/", {
 	if (!file.includes("commands")) {
 		console.log("Restarting process...");
 		process.exit(2);
-	} else if (!lock) {
-		lock = true;
-		global["bot"]._loadCMD(path.join("dist", file)).then(() => lock = false);
+	} else if (!lock[file]) {
+		lock[file] = true;
+		global["bot"]._loadCMD(path.join("dist", file)).then(() => { delete lock[file]; });
 	}
 });

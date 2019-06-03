@@ -10,16 +10,16 @@ export const command: Classes.Command = new Classes.Command({
 	exp: /^!yo(mm?(o|a)mm?a)?$/i,
 	category: "Utility",
 	data: {
-		cache: new Classes.CacheBank("yomomma", null, true, false)
+		cache: new Classes.CacheBank("yomomma", undefined, true, false, "https://api.yomomma.info/")
 	},
 	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		let repl = Classes.failsafe.bind(message);
 
 		try {
-			let reply: string = this.data.cache.get() || await Classes.fetch("https://api.yomomma.info/"),
+			let reply: string = this.data.cache.get() || await Classes.fetch(command.data.cache.source),
 				embed: RichEmbed = new RichEmbed();
 			
-			Classes.fetch("https://api.yomomma.info/").then((reply: string) => this.data.cache.push(reply));
+			Classes.fetch(command.data.cache.source).then((reply: string) => this.data.cache.push(reply));
 		
 			embed.setColor("RANDOM")
 				.setTitle("Yomomma!")

@@ -13,7 +13,7 @@ export declare var stripAnsi: {
  * VAL-1: TO BE USED BOTH WITH USER AND BOTS ACCOUNTS  - can make botnet
  * VAL-2: RELOAD ONLY MODIFIED MODULES/COMMANDS!  - external handling, _loadCMD supports singlefile
  * VAL-3: CLEAR UNDERLYING LOGSTRINGS PERIODICALLY
- * VAL-4: CACHEBANK AND NAMEDCACHEBANK IMPLEMENTATION
+ * VAL-4: CACHEBANK AND NAMEDCACHEBANK IMPLEMENTATION  -
  */
 export declare module Classes {
     namespace Options {
@@ -46,10 +46,10 @@ export declare module Classes {
         }
         interface CacheBankOpts {
             size: number;
-            cache: CacheEntry[];
             name?: string;
             autopurge?: boolean;
             reusables?: boolean;
+            source?: any;
         }
     }
     namespace Errors {
@@ -89,17 +89,31 @@ export declare module Classes {
         _remove(vale?: Vale): Promise<any>;
     }
     class CacheBank implements Options.CacheBankOpts {
-        size: number;
-        cache: CacheEntry[];
         name: string;
+        size: number;
         autopurge: boolean;
         reusables: boolean;
+        source?: any;
+        private cache;
         private static cntr;
-        constructor(name?: string, size?: number, autopurge?: boolean, reusables?: boolean);
+        constructor(name?: string, size?: number, autopurge?: boolean, reusables?: boolean, source?: any);
         get(item: number): any;
         purge(items?: number): Promise<CacheEntry[]>;
         push(item: any): number;
         _arrange(): CacheEntry[];
+        retrieve(...params: any): any;
+    }
+    class NamedCacheBank implements Options.CacheBankOpts {
+        name: string;
+        size: number;
+        source?: any;
+        private cache;
+        private static cntr;
+        constructor(name?: string, size?: number, source?: any);
+        new_cache(...params: any): CacheBank;
+        get(item: string): any;
+        push(where: string, item: any): number;
+        retrieve(...params: any): any;
     }
     function fetch(url: string | RequestOptions | URL): Promise<string>;
     function failsafe(this: Discord.Message, ...params: any[]): Promise<Discord.Message | Discord.Message[]>;

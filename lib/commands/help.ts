@@ -33,8 +33,13 @@ export const command: Classes.Command = new Classes.Command({
 				icon: vale.client.user.avatar
 			};
 		}
+
+		let arr: Classes.Command[] = (message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values()))  //reaction pagination(?)
+			.filter((cmd: Classes.Command) => !(message.author.id !== app.owner.id && cmd.category === "Owner"));
+
+		if (arr.length === 0) reply("No results found!");
 		
-		chillout.forEach((message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values())).filter((cmd: Classes.Command) => !(message.author.id !== app.owner.id && cmd.category === "Owner")), (cmd: Classes.Command): void => {
+		chillout.forEach(arr, (cmd: Classes.Command): void => {
 			let embed: RichEmbed = new RichEmbed();
 
 			embed.setColor("RANDOM")
