@@ -11,7 +11,7 @@ export const command: Classes.Command = new Classes.Command({
 	category: "Utility",
 	data: {},
 	body: async function body(message: Message, vale: Classes.Vale) {
-
+		let reply = Classes.failsafe.bind(message);
 	}, //body
 });
 

@@ -1,6 +1,12 @@
   
 # Changelog  
   
+## 2019-06-05  
+  
+- `!why`  
+- Added `typingStart` effect.  
+- `!owoify text<String>`  
+  
 ## 2019-06-03  
   
 - `!image class<String>`  

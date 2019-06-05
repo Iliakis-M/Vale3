@@ -14,6 +14,8 @@ export const command: Classes.Command = new Classes.Command({
 		let repl = Classes.failsafe.bind(message);
 
 		try {
+			message.channel.startTyping();
+			
 			let reply: string = await Classes.fetch("https://nekos.life/api/v2/chat?text=" + message.content.split(' ').slice(1).join(' '));
 
 			repl(decodeURIComponent(JSON.parse(reply).response).replace(/<.?\d+>/g, ''));
@@ -21,6 +23,8 @@ export const command: Classes.Command = new Classes.Command({
 			repl("External API error, please try again later... https://nekos.life/api/v2/endpoints");
 			console.error(err);
 		}
+
+		message.channel.stopTyping();
 	}, //body
 });
 

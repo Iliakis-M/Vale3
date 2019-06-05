@@ -21,6 +21,8 @@ This version adds portability and allows the creation of more complex botnets wh
 * `emojify sentence<String>` - Emojify your words with regional indicators!  
 * `fact` - Learn an interesting fact.  
 * `image class<String>` - Fetch a ~~N~~SFW image 0_0" .  
+* `why` - Just... Why?...  
+* `owo text<String>` - Make youw text cute ^w^ .  
   
 ### Admin  
   

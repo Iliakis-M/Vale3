@@ -14,6 +14,8 @@ export const command: Classes.Command = new Classes.Command({
 		let reply = Classes.failsafe.bind(message);
 
 		try {
+			message.channel.startTyping();
+
 			let word: string,
 				definitions = JSON.parse(await Classes.fetch("https://api.urbandictionary.com/v0/define?term=" + (word = encodeURIComponent(message.content.split(' ').slice(1).join(' '))))),
 				embed = new RichEmbed();
@@ -33,7 +35,7 @@ export const command: Classes.Command = new Classes.Command({
 				});
 			}
 			
-			reply({ embed });
+			reply({ embed }).then(() => message.channel.stopTyping());
 		} catch (err) {
 			reply("External API error, please try again later... https://www.urbandictionary.com/define.php?term=" + message.content.split(' ').slice(1).join(' '));
 			console.error(err);
