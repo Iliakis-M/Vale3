@@ -47,7 +47,8 @@ export module Vale3 {
 		vale.client.on("ready", () => {
 			vale._debug(chalk`Connected as {greenBright ${vale.client.user.tag}}  {grey.dim ---  ${Date()}}`);
 			vale.client.user.setActivity(vale.opts.config.prefix + "help", {
-				type: "LISTENING"
+				type: "LISTENING",
+				url: "https://github.com/Valen-H/Vale3"
 			});
 			if (vale.opts.custconfig && vale.opts.custconfig.whook) {
 				vale.client.fetchWebhook(vale.opts.custconfig.whook.id, vale.opts.custconfig.whook.token).then((whook: Webhook) => {

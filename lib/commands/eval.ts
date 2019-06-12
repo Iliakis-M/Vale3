@@ -34,12 +34,12 @@ export const command: Classes.Command = new Classes.Command({
 
 		if (message.author.id === app.owner.id) {
 			try {
-				message.channel.send("```js\n" + inspect(await eval(message.content.split(' ').slice(1).join(' '))) + "```", {
+				message.channel.send(inspect(await eval(message.content.split(' ').slice(1).join(' '))), {
 					split: true,
 					code: "javascript"
 				});
 			} catch (error) {
-				message.channel.send("```js\n" + error.message + "```", {
+				message.channel.send(error.message, {
 					split: true,
 					code: "javascript"
 				});

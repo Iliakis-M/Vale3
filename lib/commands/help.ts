@@ -58,7 +58,7 @@ export const command: Classes.Command = new Classes.Command({
 
 			reply({
 				split: true,
-				code: "js",
+				code: "javascript",
 				embed
 			});
 		});
