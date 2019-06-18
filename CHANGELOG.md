@@ -1,6 +1,10 @@
   
 # Changelog  
   
+## 2019-06-18  
+  
+- Fixed an `img` issue. [T13:38:59.933Z]  
+  
 ## 2019-06-12  
   
 - Fixed broken code blocks. [T16:37:27.892Z]  

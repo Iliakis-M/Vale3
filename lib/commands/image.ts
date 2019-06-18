@@ -72,7 +72,7 @@ export const command: Classes.Command = new Classes.Command({
 				if (message.channel.nsfw) {
 					cat = command.data.classes;
 				} else {
-					cat = command.data.class.filter((cls: string): boolean => command.data.nsfw.includes(cls) == false);
+					cat = command.data.classes.filter((cls: string): boolean => command.data.nsfw.includes(cls) == false);
 				}
 			} else {
 				cat = command.data.classes;
