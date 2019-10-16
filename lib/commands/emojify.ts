@@ -6,7 +6,7 @@ import { Message } from "discord.js";
 export const command: Classes.Command = new Classes.Command({
 	name: "emojify",
 	desc: "Emogify your messages with regional_indicators!",
-	usage: "!emojify sentence<String>",
+	usage: "emojify sentence<String>",
 	exp: /^!emo?j(ify)? .+$/msi,
 	category: "Utility",
 	data: { },

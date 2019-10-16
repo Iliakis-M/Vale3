@@ -6,7 +6,7 @@ import { Message } from "discord.js";
 export const command: Classes.Command = new Classes.Command({
 	name: "why",
 	desc: "Just... Why?...",
-	usage: "!why",
+	usage: "why",
 	exp: /^!why$/i,
 	category: "Utility",
 	data: {

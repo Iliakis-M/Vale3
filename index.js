@@ -2,6 +2,7 @@
 "use strict";
 
 process.title = "Vale-3";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 const mod = require("./"),

@@ -6,7 +6,7 @@ import { Message, RichEmbed } from "discord.js";
 export const command: Classes.Command = new Classes.Command({
 	name: "urban",
 	desc: "Fetch a slang definition",
-	usage: "!urban word<String>",
+	usage: "urban word<String>",
 	exp: /^!urb(an)? .+$/msi,
 	category: "Utility",
 	data: { },
