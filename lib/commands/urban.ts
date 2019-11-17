@@ -39,6 +39,7 @@ export const command: Classes.Command = new Classes.Command({
 		} catch (err) {
 			reply("External API error, please try again later... https://www.urbandictionary.com/define.php?term=" + message.content.split(' ').slice(1).join(' '));
 			console.error(err);
+			message.channel.stopTyping();
 		}
 	}, //body
 });
