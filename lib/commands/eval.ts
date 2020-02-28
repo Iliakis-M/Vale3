@@ -4,14 +4,16 @@ import Classes from "../Classes";
 import { Message, OAuth2Application } from "discord.js";
 import { inspect } from "util";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "eval",
 	desc: "Evaluate a JavaScript expression",
 	usage: "eval[ code<JS>]",
 	exp: /^!e(val)?( |\n).+$/smi,
 	category: "Owner",
-	body: async function body(message: Message, vale: Classes.Vale) {
-		let app: OAuth2Application;
+	data: { },
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
+		let app: OAuth2Application,
+			reply = Classes.failsafe.bind(message);
 
 		if (vale.client.user.bot) {
 			app = await vale.client.fetchApplication();
@@ -32,21 +34,23 @@ export const command = new Classes.Command({
 
 		if (message.author.id === app.owner.id) {
 			try {
-				message.channel.send("```js\n" + inspect(await eval(message.content.split(' ').slice(1).join(' '))) + "```", {
-					split: true
+				message.channel.send(inspect(await eval(message.content.split(' ').slice(1).join(' '))), {
+					split: true,
+					code: "javascript"
 				});
 			} catch (error) {
-				message.channel.send("```js\n" + error.message + "```", {
-					split: true
+				message.channel.send(error.message, {
+					split: true,
+					code: "javascript"
 				});
 			}
 		} else {
-			message.reply("**You are not allowed to use this command!**");
+			reply("**You are not allowed to use this command!**");
 		}
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
 	command.exp = new RegExp('^' + vale.opts.config.prefix + "e(val)?( |\n).+$", "smi");
 

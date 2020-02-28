@@ -2,44 +2,36 @@
 
 import Classes from "../Classes";
 import { Message } from "discord.js";
-import { get } from "https";
 
-export const command = new Classes.Command({
+export const command: Classes.Command = new Classes.Command({
 	name: "cat",
 	desc: "Fetch a cat emote :3",
 	usage: "cat",
-	exp: /^!cat$/i,
+	exp: /^!(cat|neko)$/i,
 	category: "Utility",
 	data: { 
-		bank: new Classes.CacheBank("Cat")
+		cache: new Classes.CacheBank("cat", undefined, true, false, "https://nekos.life/api/v2/cat")
 	},
-	body: async function body(message: Message, vale: Classes.Vale) {
-		get("https://nekos.life/api/v2/cat", (res) => {
-			let reply: string = '';
+	body: async function body(message: Message, vale?: Classes.Vale): Promise<void> {
+		let repl = Classes.failsafe.bind(message);
 
-			function procceed() {
-				try {
-					let send = JSON.parse(reply);
+		try {
+			let reply: string = this.data.cache.get() || await Classes.fetch(command.data.cache.source);
 
-					message.reply(send.cat);
-				} catch (err) {
-					message.reply("External API error, please try again later... https://nekos.life/api/v2/endpoints");
-				}
-			} //procceed
+			Classes.fetch(command.data.cache.source).then((reply: string) => command.data.cache.push(reply));
 
-			res.on("data", (chunk) => {
-				reply += chunk;
-			});
-			res.once("close", procceed);
-		}).once("error", (error) => {
-			message.reply("External API error, please try again later... https://nekos.life/api/v2/endpoints");
-		});
+			repl(decodeURIComponent(JSON.parse(reply).cat));
+		} catch (err) {
+			repl("External API error, please try again later... https://nekos.life/api/v2/endpoints");
+			console.error(err);
+		}
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
-	command.exp = new RegExp('^' + vale.opts.config.prefix + "cat$", "i");
+	command.exp = new RegExp('^' + vale.opts.config.prefix + "(cat|neko)$", "i");
+	Classes.fetch("https://nekos.life/api/v2/cat").then((reply: string) => command.data.cache.push(reply));
 
 	return command;
 } //init

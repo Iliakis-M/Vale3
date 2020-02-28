@@ -1,1 +1,1 @@
-{"version":3,"file":"8ball.d.ts","sourceRoot":"","sources":["../../../commands/8ball.ts"],"names":[],"mappings":"AAEA,OAAO,OAAO,MAAM,YAAY,CAAC;AAIjC,eAAO,MAAM,OAAO,iBAoClB,CAAC;AAEH,wBAAsB,IAAI,CAAC,IAAI,EAAE,OAAO,CAAC,IAAI,4BAK5C;AAED,eAAe,IAAI,CAAC"}
+{"version":3,"file":"8ball.d.ts","sourceRoot":"","sources":["../../../commands/8ball.ts"],"names":[],"mappings":"AAEA,OAAO,OAAO,MAAM,YAAY,CAAC;AAGjC,eAAO,MAAM,OAAO,EAAE,OAAO,CAAC,OAgC5B,CAAC;AAEH,wBAAsB,IAAI,CAAC,IAAI,EAAE,OAAO,CAAC,IAAI,GAAG,OAAO,CAAC,OAAO,CAAC,OAAO,CAAC,CAMvE;AAED,eAAe,IAAI,CAAC"}

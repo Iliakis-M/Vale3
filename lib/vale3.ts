@@ -1,12 +1,17 @@
 "use strict";
 
 
+/**
+ * Add spawn'd cli eval
+ */
+
+
 import Panel from "adm-panel2";
 import Classes from "./Classes";
 import * as fs from "fs-extra";
 import { inspect } from "util";
 import { Message, RateLimitInfo, Webhook } from "discord.js";
-export const chalk = require("chalk");
+export const chalk = require("./Classes").chalk;
 
 
 export module Vale3 {
@@ -31,7 +36,7 @@ export module Vale3 {
 		bot._panel = panel;
 			
 		panel.toggleStats();
-		panel.start().then(() => bot._debug("Panel Started."));
+		panel.start().then(() => bot._debug(chalk`Panel Started.  {grey.dim ---  ${Date()}}`));
 		
 		bot.start();
 		bot._loadCMD(from);
@@ -40,9 +45,10 @@ export module Vale3 {
 
 	export async function setup(vale: Classes.Vale) {
 		vale.client.on("ready", () => {
-			vale._debug(chalk`Connected as {greenBright ${vale.client.user.tag}}`);
+			vale._debug(chalk`Connected as {greenBright ${vale.client.user.tag}}  {grey.dim ---  ${Date()}}`);
 			vale.client.user.setActivity(vale.opts.config.prefix + "help", {
-				type: "LISTENING"
+				type: "LISTENING",
+				url: "https://github.com/Valen-H/Vale3"
 			});
 			if (vale.opts.custconfig && vale.opts.custconfig.whook) {
 				vale.client.fetchWebhook(vale.opts.custconfig.whook.id, vale.opts.custconfig.whook.token).then((whook: Webhook) => {
@@ -51,22 +57,26 @@ export module Vale3 {
 						disableEveryone: true,
 						code: "JavaScript"
 					});
-				});
-			}
-		});
-		vale.on("log", (...msg) => {
-			if (vale.whook) {
-				vale.whook.send(`_Debug:  ${msg}  ---  ${Date()}`, {
-					disableEveryone: true,
-					code: "JavaScript"
+					vale.on("rawlog", (...msg) => {
+						if (vale.whook) {
+							vale.whook.send(`_Debug:  ${msg}  ---  ${Date()}`, {
+								disableEveryone: true,
+								code: "JavaScript"
+							});
+						}
+					});
 				});
 			}
 		});
 		vale.client.on("reconnecting", () => {
-			vale._debug(chalk`{cyan.dim Client reconnecting...}`);
+			vale._debug(chalk`{cyan.dim Client reconnecting...}  {grey.dim ---  ${Date()}}`);
 		});
-		vale.on("disconnect", (event: CloseEvent) => {  //https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+		vale.client.on("disconnect", (event: CloseEvent) => {  //https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
 			vale._debug(chalk`{red Client Disconnected} | {cyan ${event.reason}}`);
+			if (vale.whook) vale.whook.send(`Bot disconnected.  ---  ${Date()}`, {
+				disableEveryone: true,
+				code: "JavaScript"
+			});
 		});
 		vale.client.on("error", (error: Error) => {
 			vale._debug(chalk.red.dim(`Connection Error: {redBright ${inspect(error)}}`));

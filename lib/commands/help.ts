@@ -1,17 +1,21 @@
 "use strict";
 
-import Classes from "../Classes";
+import Classes, { chillout } from "../Classes";
 import { Message, RichEmbed, OAuth2Application } from "discord.js";
 
-export const command = new Classes.Command({
+//Perhaps combine all occurence-searches in one and split general help screen to code block?
+
+export const command: Classes.Command = new Classes.Command({
 	name: "help",
 	desc: "Get usage help for a command",
 	usage: "help[ command<String>]",
 	category: "Utility",
 	exp: /^!he?lp( .+)?$/smi,
-	body: async function body(message: Message, vale: Classes.Vale) {
+	data: { },
+	body: async function body(message: Message, vale: Classes.Vale): Promise<void> {
 		let reg = message.content.split(' ').slice(1).join(' '),
-			app: OAuth2Application;
+			app: OAuth2Application,
+			reply = Classes.failsafe.bind(message);
 		
 		if (vale.client.user.bot) {
 			app = await vale.client.fetchApplication();
@@ -29,17 +33,16 @@ export const command = new Classes.Command({
 				icon: vale.client.user.avatar
 			};
 		}
+
+		let arr: Classes.Command[] = (message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values()))  //reaction pagination(?)
+			.filter((cmd: Classes.Command) => !(message.author.id !== app.owner.id && cmd.category === "Owner"));
+
+		if (arr.length === 0) reply("No results found!");
 		
-		(message.content.includes(' ') ? Array.from(vale.commands.values()).filter((cmd: Classes.Command) => cmd.name.includes(reg)) : Array.from(vale.commands.values())).filter((cmd: Classes.Command) => {
-			if (message.author.id !== app.owner.id && cmd.category === "Owner") {
-				return false;
-			} else {
-				return true;
-			}
-		}).forEach((cmd: Classes.Command) => {
+		chillout.forEach(arr, (cmd: Classes.Command): void => {
 			let embed: RichEmbed = new RichEmbed();
 
-			embed.setColor('#' + Math.round(Math.random() * (255 ** 3)).toString(16))
+			embed.setColor("RANDOM")
 			.setAuthor("Vale3", vale.client.user.displayAvatarURL, `https://discordapp.com/users/${app.owner.id}`)
 			.setThumbnail(vale.client.user.avatarURL)
 			.setURL("https://github.com/Valen-H/Vale-3")
@@ -53,16 +56,16 @@ export const command = new Classes.Command({
 			.addField("Description", cmd.desc)
 			.addField("Category", cmd.category);
 
-			message.reply({
+			reply({
 				split: true,
-				code: "js",
+				code: "javascript",
 				embed
 			});
 		});
 	}, //body
 });
 
-export async function init(vale: Classes.Vale) {
+export async function init(vale: Classes.Vale): Promise<Classes.Command> {
 	command.usage = vale.opts.config.prefix + command.usage;
 	command.exp = new RegExp('^' + vale.opts.config.prefix + "he?lp( .+)?$", "smi");
 
